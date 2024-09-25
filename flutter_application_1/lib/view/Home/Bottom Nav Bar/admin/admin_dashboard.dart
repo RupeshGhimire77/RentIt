@@ -66,6 +66,7 @@ class AdminDashboardState extends State<AdminDashboard> {
     super.initState();
     getValue();
     getUserData();
+    getCarData();
   }
 
   String? name, email, role;
@@ -88,6 +89,16 @@ class AdminDashboardState extends State<AdminDashboard> {
       () async {
         var provider = Provider.of<UserProvider>(context, listen: false);
         await provider.getUser();
+      },
+    );
+  }
+
+  getCarData() async {
+    Future.delayed(
+      Duration.zero,
+      () async {
+        var provider = Provider.of<CarProvider>(context, listen: false);
+        await provider.getCar();
       },
     );
   }
@@ -206,191 +217,225 @@ class AdminDashboardState extends State<AdminDashboard> {
                   ],
                 ),
                 if (selectedIndex == 0)
-                  Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          file.path.isEmpty
-                              ? SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.2,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.6,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                        8.0), // Optional: Add rounded corners
-                                    child: Image.asset(
-                                      "assets/images/background.png",
-                                      fit: BoxFit
-                                          .contain, // Use BoxFit.cover to fill the box
-                                    ),
-                                  ),
-                                )
-                              : SizedBox(
-                                  height: 100,
-                                  width: 100,
-                                  child: ClipRRect(
-                                    child: Image.file(file),
-                                  ),
-                                ),
-                          CustomButton(
-                              onPressed: () async {
-                                await pickImage();
-                              },
-                              child: loader == true
-                                  ? CircularProgressIndicator()
-                                  : Text(
-                                      "Upload Image",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    )),
-                          CustomTextFormField(
-                            labelText: modelCarStr,
-                            onChanged: (p0) {
-                              carProvider.setModel(p0);
-                            },
-                            validator: (p0) {
-                              if (p0!.isEmpty) {
-                                return carValidStr;
-                              }
-                              return null;
-                            },
-                          ),
-                          if (downloadUrl != null)
-                            Visibility(
-                              visible: false,
-                              child: CustomTextFormField(
-                                controller: carProvider.setImage(downloadUrl!),
-                                labelText: "Car Image",
-                              ),
-                            ),
-                          CustomTextFormField(
-                            onChanged: (p0) {
-                              carProvider.setYear(p0);
-                            },
-                            labelText: carYearStr,
-                            validator: (p0) {
-                              if (p0!.isEmpty) {
-                                return carValidStr;
-                              }
-                              return null;
-                            },
-                          ),
-                          CustomTextFormField(
-                            onChanged: (p0) {
-                              carProvider.setTransmissionType(p0);
-                            },
-                            labelText: transmissionTypeStr,
-                            validator: (p0) {
-                              if (p0!.isEmpty) {
-                                return carValidStr;
-                              }
-                              return null;
-                            },
-                          ),
-                          CustomTextFormField(
-                            onChanged: (p0) {
-                              carProvider.setSeatingCapactiy(p0);
-                            },
-                            labelText: seatingCapacityStr,
-                          ),
-                          CustomTextFormField(
-                            onChanged: (p0) {
-                              carProvider.setVehicalType(p0);
-                            },
-                            labelText: vehicalTypeStr,
-                          ),
-                          CustomTextFormField(
-                            onChanged: (p0) {
-                              carProvider.setFuelType(p0);
-                            },
-                            labelText: fuelTypeStr,
-                          ),
-                          CustomTextFormField(
-                            onChanged: (p0) {
-                              carProvider.setMileage(p0);
-                            },
-                            labelText: mileageStr,
-                          ),
-                          CustomTextFormField(
-                            onChanged: (p0) {
-                              carProvider.setRentalPrice(p0);
-                            },
-                            labelText: rentalPriceStr,
-                            keyboardType: TextInputType.number,
-                          ),
-                          CustomButton(
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  await carProvider.saveCar();
-                                  if (carProvider.saveCarStatus ==
-                                      StatusUtil.success) {
-                                    await Helper.displaySnackBar(
-                                        context, "Car Successfully Saved.");
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => AdminBottomNavBar(
-                                          initialIndex: 1,
-                                        ),
-                                      ),
-                                      (route) => false,
-                                    );
-                                  }
-                                } else if (carProvider.saveCarStatus ==
-                                    StatusUtil.error) {
-                                  Helper.displaySnackBar(
-                                      context, "Car Could not be Saved.");
-                                }
-                              },
-                              child: Text(
-                                'Add Car',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
-                              )),
-                          if (selectedIndex == 1)
-                            Consumer<UserProvider>(
-                              builder: (context, userProvider, child) =>
-                                  SizedBox(
-                                height: 100,
-                                width: MediaQuery.of(context).size.width,
-                                child: ListView.builder(
-                                  itemCount: userProvider.userList.length,
-                                  itemBuilder: (context, index) {
-                                    return Card(
-                                      margin: EdgeInsets.symmetric(
-                                          vertical: 8.0, horizontal: 16.0),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              "Name: ",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.black),
-                                            ),
-                                            Text(
-                                              userProvider
-                                                      .userList[index].name ??
-                                                  "",
-                                              style: TextStyle(fontSize: 16),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            )
-                        ],
-                      ))
+                  _buildAddCarForm()
+                else if (selectedIndex == 1)
+                  _buildUserList(userProvider)
+                else if (selectedIndex == 2)
+                  _buildCarList(),
               ]),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAddCarForm() {
+    return Consumer<CarProvider>(
+      builder: (context, carProvider, child) => Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              file.path.isEmpty
+                  ? SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.2,
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                            8.0), // Optional: Add rounded corners
+                        child: Image.asset(
+                          "assets/images/background.png",
+                          fit: BoxFit
+                              .contain, // Use BoxFit.cover to fill the box
+                        ),
+                      ),
+                    )
+                  : SizedBox(
+                      height: 100,
+                      width: 100,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(file),
+                      ),
+                    ),
+              CustomButton(
+                  onPressed: () async {
+                    await pickImage();
+                  },
+                  child: loader == true
+                      ? CircularProgressIndicator()
+                      : Text(
+                          "Upload Image",
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        )),
+              CustomTextFormField(
+                labelText: modelCarStr,
+                onChanged: (p0) {
+                  carProvider.setModel(p0);
+                },
+                validator: (p0) {
+                  if (p0!.isEmpty) {
+                    return carValidStr;
+                  }
+                  return null;
+                },
+              ),
+              if (downloadUrl != null)
+                Visibility(
+                  visible: false,
+                  child: CustomTextFormField(
+                    controller: carProvider.setImage(downloadUrl!),
+                    labelText: "Car Image",
+                  ),
+                ),
+              CustomTextFormField(
+                onChanged: (p0) {
+                  carProvider.setYear(p0);
+                },
+                labelText: carYearStr,
+                validator: (p0) {
+                  if (p0!.isEmpty) {
+                    return carValidStr;
+                  }
+                  return null;
+                },
+              ),
+              CustomTextFormField(
+                onChanged: (p0) {
+                  carProvider.setTransmissionType(p0);
+                },
+                labelText: transmissionTypeStr,
+                validator: (p0) {
+                  if (p0!.isEmpty) {
+                    return carValidStr;
+                  }
+                  return null;
+                },
+              ),
+              CustomTextFormField(
+                onChanged: (p0) {
+                  carProvider.setSeatingCapactiy(p0);
+                },
+                labelText: seatingCapacityStr,
+              ),
+              CustomTextFormField(
+                onChanged: (p0) {
+                  carProvider.setVehicalType(p0);
+                },
+                labelText: vehicalTypeStr,
+              ),
+              CustomTextFormField(
+                onChanged: (p0) {
+                  carProvider.setFuelType(p0);
+                },
+                labelText: fuelTypeStr,
+              ),
+              CustomTextFormField(
+                onChanged: (p0) {
+                  carProvider.setMileage(p0);
+                },
+                labelText: mileageStr,
+              ),
+              CustomTextFormField(
+                onChanged: (p0) {
+                  carProvider.setRentalPrice(p0);
+                },
+                labelText: rentalPriceStr,
+                keyboardType: TextInputType.number,
+              ),
+              CustomButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await carProvider.saveCar();
+                      if (carProvider.saveCarStatus == StatusUtil.success) {
+                        await Helper.displaySnackBar(
+                            context, "Car Successfully Saved.");
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AdminBottomNavBar(
+                              initialIndex: 0,
+                            ),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    } else if (carProvider.saveCarStatus == StatusUtil.error) {
+                      Helper.displaySnackBar(
+                          context, "Car Could not be Saved.");
+                    }
+                  },
+                  child: Text(
+                    'Add Car',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  )),
+            ],
+          )),
+    );
+  }
+
+// Method to build the User List
+  Widget _buildUserList(UserProvider userProvider) {
+    if (userProvider.userList.isEmpty) {
+      return Center(child: Text("No users found."));
+    }
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.5,
+      child: ListView.builder(
+        itemCount: userProvider.userList.length,
+        itemBuilder: (context, index) {
+          final user = userProvider.userList[index];
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Name: ${user.name ?? "Unknown"}"),
+                  Text("Email: ${user.email ?? "N/A"}"),
+                  Text("Contact: ${user.mobileNumber ?? "N/A"}"),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+// Method to build the Car List
+  Widget _buildCarList() {
+    // Implement similar to _buildUserList
+    return Consumer<CarProvider>(
+      builder: (context, carProvider, child) {
+        if (carProvider.carList.isEmpty) {
+          return Center(child: Text("No cars found."));
+        }
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.5,
+          child: ListView.builder(
+            itemCount: carProvider.carList.length,
+            itemBuilder: (context, index) {
+              final car = carProvider.carList[index];
+              return Card(
+                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Car Model: ${car.model ?? "Unknown"}"),
+                      Text("Vehicle Type: ${car.vehicleType ?? "N/A"}"),
+                      Text("Year: ${car.year ?? "N/A"}"),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -464,7 +509,7 @@ class AdminDashboardState extends State<AdminDashboard> {
         downloadUrl;
         loader = false;
       });
-      // print("downloadUrl$downloadUrl");
+      print("downloadUrl$downloadUrl");
     } catch (e) {
       setState(() {
         loader = false;
