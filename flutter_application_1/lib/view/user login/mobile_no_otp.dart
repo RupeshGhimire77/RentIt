@@ -16,6 +16,7 @@ class _MobileNoOTPState extends State<MobileNoOTP> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF771616),
       body: SafeArea(
           child: SingleChildScrollView(
         child: Column(
@@ -25,14 +26,14 @@ class _MobileNoOTPState extends State<MobileNoOTP> {
               padding: const EdgeInsets.only(top: 100, left: 20),
               child: Text(
                 "Forget Password",
-                style: TextStyle(fontSize: 32),
+                style: TextStyle(fontSize: 32, color: Colors.white),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 10, left: 20),
               child: Text(
                 "Recover Password",
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),
             Padding(
@@ -41,7 +42,7 @@ class _MobileNoOTPState extends State<MobileNoOTP> {
                 onChanged: (value) {
                   phoneNumber = value;
                 },
-                hintText: " Mobile Number",
+                hintText: " Enter Your Mobile Number",
               ),
             ),
             Padding(
@@ -65,7 +66,10 @@ class _MobileNoOTPState extends State<MobileNoOTP> {
                       codeAutoRetrievalTimeout: (String verificationId) {},
                     );
                   },
-                  child: Text("Recover")),
+                  child: Text(
+                    "Recover",
+                    style: TextStyle(color: Colors.white),
+                  )),
             )
           ],
         ),

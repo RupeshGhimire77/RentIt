@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
-class User {
+class User1 {
+  String? id;
   String? name;
   String? role;
   String? email;
@@ -8,15 +9,17 @@ class User {
   String? confirmPassword;
   String? mobileNumber;
 
-  User(
-      {this.name,
+  User1(
+      {this.id,
+      this.name,
       this.email,
       this.password,
       this.confirmPassword,
       this.role,
       this.mobileNumber});
 
-  User.fromJson(Map<String, dynamic> json) {
+  User1.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     name = json['name'];
     email = json['email'];
     password = json['password'];
@@ -27,6 +30,7 @@ class User {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
     data['name'] = this.name;
     data['email'] = this.email;
     data['password'] = this.password;

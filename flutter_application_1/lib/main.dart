@@ -1,11 +1,19 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_application_1/Utils/helper.dart';
 import 'package:flutter_application_1/firebase_options.dart';
+import 'package:flutter_application_1/provider/car_provider.dart';
 import 'package:flutter_application_1/provider/user_provider.dart';
-import 'package:flutter_application_1/view/Home/home_page.dart';
+import 'package:flutter_application_1/view/Home/Bottom%20Nav%20Bar/home_page.dart';
+import 'package:flutter_application_1/view/Home/bottom_navbar.dart';
 
 import 'package:flutter_application_1/view/user%20login/login.dart';
+import 'package:flutter_application_1/view/user%20login/mobile_no_otp.dart';
 import 'package:flutter_application_1/view/user%20login/sign_up.dart';
+import 'package:flutter_application_1/view/user_edit.dart';
 
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,6 +48,9 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(
           create: (context) => UserProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => CarProvider(),
         )
       ],
       child: MaterialApp(
@@ -51,8 +62,8 @@ class _MyAppState extends State<MyApp> {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        //  home: isUserLoggedIn ? HomePage() : Login(),
-        home: SignUp(),
+        home: isUserLoggedIn ? BottomNavBar() : Login(),
+        // home: UserEdit(),
       ),
     );
   }
@@ -64,4 +75,33 @@ class _MyAppState extends State<MyApp> {
       isUserLoggedIn;
     });
   }
+  // appExitShowDialog(BuildContext context, UserProvider userProvider) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Exit'),
+  //         content: Text('Are you sure you want to Exit?'),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () async {
+
+  //               SystemNavigator.pop();
+
+  //               // Perform delete operation here
+  //               // Navigator.of(context).pop(); // Close the dialog
+  //             },
+  //             child: Text('Yes'),
+  //           ),
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop(); // Close the dialog
+  //             },
+  //             child: Text('No'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 }

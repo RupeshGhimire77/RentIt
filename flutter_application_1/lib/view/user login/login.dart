@@ -4,12 +4,15 @@ import 'package:flutter_application_1/Utils/helper.dart';
 import 'package:flutter_application_1/Utils/status_util.dart';
 import 'package:flutter_application_1/provider/user_provider.dart';
 import 'package:flutter_application_1/shared/custom_textform.dart';
+import 'package:flutter_application_1/view/Home/Bottom%20Nav%20Bar/admin/admin_bottom_navbar.dart';
+import 'package:flutter_application_1/view/Home/bottom_navbar.dart';
 import 'package:flutter_application_1/view/user%20login/change_password.dart';
-import 'package:flutter_application_1/view/Home/home_page.dart';
+import 'package:flutter_application_1/view/Home/Bottom%20Nav%20Bar/home_page.dart';
 import 'package:flutter_application_1/view/user%20login/mobile_no_otp.dart';
 import 'package:flutter_application_1/view/user%20login/sign_up.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Utils/string_const.dart';
 import '../../shared/custom_button.dart';
@@ -33,8 +36,22 @@ class _LoginState extends State<Login> {
         provider.readRememberMe();
       },
     );
+    getValue();
   }
 
+  String? name, email, role;
+
+  getValue() {
+    Future.delayed(Duration.zero, () async {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      name = prefs.getString("name");
+      email = prefs.getString("email");
+      role = prefs.getString("role");
+    });
+  }
+
+  bool rememberMe = false;
+  bool checkedStatus = false;
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -111,7 +128,7 @@ class _LoginState extends State<Login> {
                       Theme(
                         data: ThemeData(unselectedWidgetColor: Colors.white),
                         child: Checkbox(
-                          // overlayColor: Color(0xff123671),
+                          overlayColor: MaterialStateProperty.all(Colors.white),
                           activeColor: Colors.white,
                           checkColor: Color(0xff771616),
                           value: userProvider.checkRemeberMe,
@@ -153,12 +170,22 @@ class _LoginState extends State<Login> {
                             await Helper.displaySnackBar(
                                 context, loginSuccessStr);
                             await userProvider.storeValueToSharedPreference();
-                            Navigator.pushAndRemoveUntil(
+                            if (role == "user") {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BottomNavBar(),
+                                  ),
+                                  (route) => false);
+                            } else if (role == "admin") {
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => HomePage(),
+                                  builder: (context) => AdminBottomNavBar(),
                                 ),
-                                (route) => false);
+                                (route) => false,
+                              );
+                            }
                           } else {
                             await Helper.displaySnackBar(
                                 context, userDoesntExiststr);

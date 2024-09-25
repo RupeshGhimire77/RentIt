@@ -45,7 +45,7 @@ class _SignUpState extends State<SignUp> {
                 Visibility(
                   visible: false,
                   child: TextFormField(
-                    initialValue: "user",
+                    controller: userProvider.setRole("user"),
                   ),
                 ),
                 CustomTextFormField(

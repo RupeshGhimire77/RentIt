@@ -29,7 +29,7 @@ String signInStr = "Sign In";
 String loginSuccessStr = "Successfully Logged In.";
 String invalidCredentialsStr = "Invalid Credentials.";
 String loginFailedStr = "Login Failed.";
-String userDoesntExiststr = "user doesn't exits.";
+String userDoesntExiststr = "user doesn't exists.";
 String dontHaveAnAccountStr = "Don't Have an Account?";
 String userAlreadyExistStr = "User with same email already exist.";
 String userWithMobileNumberAlreadyExistStr =
@@ -38,3 +38,15 @@ String rememberMeStr = "Remember me";
 String signInToYourAccountStr = "Sign In to your Account.";
 String logoutSuccessfullStr = "Logout Successfull.";
 String forgotPasswordStr = "Forgot Password?";
+
+String modelCarStr = "Enter the model of the car";
+String carValidStr = "The Field cannot be empty";
+String carYearStr = "The year car was made";
+String transmissionTypeStr = "transmission type of the car ";
+
+String seatingCapacityStr = "Seating Capacity";
+String vehicalTypeStr = "Vehical Type";
+String fuelTypeStr = "Fuel Type";
+
+String mileageStr = "Mileage";
+String rentalPriceStr = "Rental Price";

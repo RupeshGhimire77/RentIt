@@ -9,6 +9,7 @@ import 'package:flutter_application_1/service/user_service_impl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
+  String? id;
   String? name, email, password, confirmPassword, mobileNumber;
   String? errorMessage;
 
@@ -25,9 +26,19 @@ class UserProvider extends ChangeNotifier {
 
   TextEditingController emailTextField = TextEditingController();
   TextEditingController passwordTextField = TextEditingController();
+  TextEditingController? roleTextField;
+
+  setRole(value) {
+    roleTextField = TextEditingController(text: value);
+  }
 
   isCheckedStatus(value) {
     checkRemeberMe = value!;
+    notifyListeners();
+  }
+
+  setId(value) {
+    id = value;
     notifyListeners();
   }
 
@@ -56,12 +67,7 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  setRole(value) {
-    role = value;
-    notifyListeners();
-  }
-
-  List<User> userList = [];
+  List<User1> userList = [];
   UserService userService = UserServiceImpl();
 
   StatusUtil _saveUserStatus = StatusUtil.none;
@@ -109,8 +115,9 @@ class UserProvider extends ChangeNotifier {
       setSaveUserStatus(StatusUtil.loading);
     }
 
-    User user = User(
-        role: role,
+    User1 user = User1(
+        id: id,
+        role: roleTextField?.text,
         name: name,
         email: email,
         password: password,
@@ -129,14 +136,14 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> getUser() async {
-    if (_getUserStatus == StatusUtil.loading) {
+    if (_getUserStatus != StatusUtil.loading) {
       setGetUserStatus(StatusUtil.loading);
 
       ApiResponse response = await userService.getUser();
-      if (_getUserStatus == StatusUtil.success) {
+      if (response.statusUtil == StatusUtil.success) {
         userList = response.data;
         setGetUserStatus(StatusUtil.success);
-      } else if (_getUserStatus == StatusUtil.error) {
+      } else if (response.statusUtil == StatusUtil.error) {
         errorMessage = response.errorMessage;
         setGetUserStatus(StatusUtil.error);
       }
@@ -147,7 +154,7 @@ class UserProvider extends ChangeNotifier {
     if (_getCheckEmailExistInSignUp != StatusUtil.loading) {
       setGetCheckEmailExistInSignUP(StatusUtil.loading);
     }
-    User user = User(email: email);
+    User1 user = User1(email: email);
     ApiResponse response = await userService.doesEmailExistOnSignUp(user);
 
     if (response.statusUtil == StatusUtil.success) {
@@ -164,7 +171,7 @@ class UserProvider extends ChangeNotifier {
       setGetCheckMobileNumberOnSignUp(StatusUtil.loading);
     }
 
-    User user = User(mobileNumber: mobileNumber);
+    User1 user = User1(mobileNumber: mobileNumber);
     ApiResponse response =
         await userService.doesMobileNumberExistOnSignUp(user);
 
@@ -181,13 +188,25 @@ class UserProvider extends ChangeNotifier {
     if (getLoginUserStatus != StatusUtil.loading) {
       setGetLoginUserStatus(StatusUtil.loading);
     }
-    User user =
-        User(email: emailTextField.text, password: passwordTextField.text);
+    User1 user = User1(
+      email: emailTextField.text,
+      password: passwordTextField.text,
+    );
 
     ApiResponse response = await userService.checkUserData(user);
 
     if (response.statusUtil == StatusUtil.success) {
-      isUserExist = response.data;
+      User1? userData = response.data;
+      if (userData != null) {
+        UserData.userData = userData;
+        isUserExist = true;
+
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("name", userData.name.toString());
+        prefs.setString("email", userData.email.toString());
+        prefs.setString("role", userData.role.toString());
+      }
+
       setGetLoginUserStatus(StatusUtil.success);
     } else if (response.statusUtil == StatusUtil.error) {
       errorMessage = response.errorMessage;
@@ -219,4 +238,8 @@ class UserProvider extends ChangeNotifier {
     passwordTextField.text = await prefs.getString('password') ?? "";
     notifyListeners();
   }
+}
+
+class UserData {
+  static User1? userData;
 }
