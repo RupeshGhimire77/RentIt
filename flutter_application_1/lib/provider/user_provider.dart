@@ -9,7 +9,7 @@ import 'package:flutter_application_1/service/user_service_impl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
-  String? id;
+  // String? id;
   String? name, email, password, confirmPassword, mobileNumber;
   String? errorMessage;
 
@@ -37,10 +37,10 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  setId(value) {
-    id = value;
-    notifyListeners();
-  }
+  // setId(value) {
+  //   id = value;
+  //   notifyListeners();
+  // }
 
   setName(value) {
     name = value;
@@ -116,7 +116,7 @@ class UserProvider extends ChangeNotifier {
     }
 
     User1 user = User1(
-        id: id,
+        // id: id,
         role: roleTextField?.text,
         name: name,
         email: email,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Utils/helper.dart';
 import 'package:flutter_application_1/Utils/status_util.dart';
 import 'package:flutter_application_1/Utils/string_const.dart';
+import 'package:flutter_application_1/model/car.dart';
 import 'package:flutter_application_1/model/user.dart';
 import 'package:flutter_application_1/provider/car_provider.dart';
 import 'package:flutter_application_1/provider/user_provider.dart';
@@ -18,15 +19,15 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminDashboard extends StatefulWidget {
-  const AdminDashboard({super.key});
+  User1? user;
+  Car? car;
+  AdminDashboard({super.key, this.user, this.car});
 
   @override
   State<AdminDashboard> createState() => AdminDashboardState();
 }
 
 class AdminDashboardState extends State<AdminDashboard> {
-  User1? user;
-
   List<String> adminMethods = [
     "Add Cars",
     "User's List",
@@ -63,6 +64,20 @@ class AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     // TODO: implement initState
+    if (widget.car != null) {
+      var provider = Provider.of<CarProvider>(context, listen: false);
+      provider.id = widget.car!.id ?? "";
+      provider.model = widget.car!.model ?? "";
+      provider.year = widget.car!.year ?? "";
+      provider.image = widget.car!.image ?? "";
+      provider.transmissionType = widget.car!.transmissionType ?? "";
+      provider.vehicalType = widget.car!.vehicleType ?? "";
+      provider.seatingCapacity = widget.car!.seatingCapacity ?? "";
+      provider.fuelType = widget.car!.fuelType ?? "";
+      provider.mileage = widget.car!.mileage ?? "";
+      provider.rentalPrice = widget.car!.rentalPrice ?? "";
+    }
+
     super.initState();
     getValue();
     getUserData();
@@ -236,31 +251,49 @@ class AdminDashboardState extends State<AdminDashboard> {
           key: _formKey,
           child: Column(
             children: [
-              file.path.isEmpty
-                  ? SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.2,
-                      width: MediaQuery.of(context).size.width * 0.6,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            8.0), // Optional: Add rounded corners
-                        child: Image.asset(
-                          "assets/images/background.png",
-                          fit: BoxFit
-                              .contain, // Use BoxFit.cover to fill the box
+              // SizedBox(
+              //         height: MediaQuery.of(context).size.height * 0.2,
+              //         width: MediaQuery.of(context).size.width * 0.6,
+              //         child: ClipRRect(
+              //           borderRadius: BorderRadius.circular(
+              //               8.0), // Optional: Add rounded corners
+              //           child: Image.asset(
+              //             "assets/images/background.png",
+              //             fit: BoxFit
+              //                 .contain, // Use BoxFit.cover to fill the box
+              //           ),
+              //         ),
+              //       ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.2,
+                width: MediaQuery.of(context).size.width * 0.6,
+                child: file.path.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(
+                          file,
+                          fit: BoxFit.contain,
                         ),
-                      ),
-                    )
-                  : SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(file),
-                      ),
-                    ),
+                      )
+                    : (downloadUrl != null)
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              downloadUrl!,
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.asset(
+                              "assets/images/background.png",
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+              ),
               CustomButton(
-                  onPressed: () async {
-                    await pickImage();
+                  onPressed: () {
+                    pickImage();
                   },
                   child: loader == true
                       ? CircularProgressIndicator()
@@ -268,7 +301,18 @@ class AdminDashboardState extends State<AdminDashboard> {
                           "Upload Image",
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         )),
+              if (downloadUrl != null)
+                Visibility(
+                  visible: true,
+                  child: CustomTextFormField(
+                    controller: carProvider.setImage(downloadUrl!),
+                    labelText: "Car Image",
+                  ),
+                )
+              else
+                SizedBox(),
               CustomTextFormField(
+                initialValue: carProvider.model,
                 labelText: modelCarStr,
                 onChanged: (p0) {
                   carProvider.setModel(p0);
@@ -280,15 +324,8 @@ class AdminDashboardState extends State<AdminDashboard> {
                   return null;
                 },
               ),
-              if (downloadUrl != null)
-                Visibility(
-                  visible: false,
-                  child: CustomTextFormField(
-                    controller: carProvider.setImage(downloadUrl!),
-                    labelText: "Car Image",
-                  ),
-                ),
               CustomTextFormField(
+                initialValue: carProvider.year,
                 onChanged: (p0) {
                   carProvider.setYear(p0);
                 },
@@ -301,6 +338,7 @@ class AdminDashboardState extends State<AdminDashboard> {
                 },
               ),
               CustomTextFormField(
+                initialValue: carProvider.transmissionType,
                 onChanged: (p0) {
                   carProvider.setTransmissionType(p0);
                 },
@@ -313,30 +351,35 @@ class AdminDashboardState extends State<AdminDashboard> {
                 },
               ),
               CustomTextFormField(
+                initialValue: carProvider.seatingCapacity,
                 onChanged: (p0) {
                   carProvider.setSeatingCapactiy(p0);
                 },
                 labelText: seatingCapacityStr,
               ),
               CustomTextFormField(
+                initialValue: carProvider.vehicalType,
                 onChanged: (p0) {
                   carProvider.setVehicalType(p0);
                 },
                 labelText: vehicalTypeStr,
               ),
               CustomTextFormField(
+                initialValue: carProvider.fuelType,
                 onChanged: (p0) {
                   carProvider.setFuelType(p0);
                 },
                 labelText: fuelTypeStr,
               ),
               CustomTextFormField(
+                initialValue: carProvider.mileage,
                 onChanged: (p0) {
                   carProvider.setMileage(p0);
                 },
                 labelText: mileageStr,
               ),
               CustomTextFormField(
+                initialValue: carProvider.rentalPrice,
                 onChanged: (p0) {
                   carProvider.setRentalPrice(p0);
                 },
@@ -365,10 +408,12 @@ class AdminDashboardState extends State<AdminDashboard> {
                           context, "Car Could not be Saved.");
                     }
                   },
-                  child: Text(
-                    'Add Car',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  )),
+                  child: carProvider.saveCarStatus == StatusUtil.loading
+                      ? CircularProgressIndicator()
+                      : Text(
+                          'Add Car',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        )),
             ],
           )),
     );
@@ -413,7 +458,7 @@ class AdminDashboardState extends State<AdminDashboard> {
           return Center(child: Text("No cars found."));
         }
         return SizedBox(
-          height: MediaQuery.of(context).size.height * 0.5,
+          height: MediaQuery.of(context).size.height,
           child: ListView.builder(
             itemCount: carProvider.carList.length,
             itemBuilder: (context, index) {
@@ -422,12 +467,32 @@ class AdminDashboardState extends State<AdminDashboard> {
                 margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text("Car Model: ${car.model ?? "Unknown"}"),
-                      Text("Vehicle Type: ${car.vehicleType ?? "N/A"}"),
-                      Text("Year: ${car.year ?? "N/A"}"),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Car Model: ${car.model ?? "Unknown"}"),
+                          Text("Vehicle Type: ${car.vehicleType ?? "N/A"}"),
+                          Text("Year: ${car.year ?? "N/A"}"),
+                          // Text("Id: ${car.id ?? "null"}")
+                          Text("Rental Price: ${car.rentalPrice ?? "N/A"}")
+                        ],
+                      ),
+                      Spacer(),
+                      IconButton(
+                          onPressed: () {
+                            editShowDialog(context, carProvider,
+                                carProvider.carList[index]);
+                          },
+                          icon: Icon(Icons.edit)),
+                      IconButton(
+                          onPressed: () async {
+                            String id = carProvider.carList[index].id!;
+                            await deleteShowDialog(context, carProvider, id);
+                            // carProvider.deleteCar(carProvider.carList[index].id!);
+                          },
+                          icon: Icon(Icons.delete))
                     ],
                   ),
                 ),
@@ -489,31 +554,116 @@ class AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  deleteShowDialog(BuildContext context, CarProvider carProvider, String id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Car'),
+          content: Text('Are you sure you want to delete this car?'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await carProvider.deleteCar(id);
+
+                if (carProvider.deleteCarStatus == StatusUtil.success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Car deleted successfully!")),
+                  );
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AdminBottomNavBar(
+                              initialIndex: 1,
+                            )),
+                    (route) => false,
+                  );
+                  // Navigator.pop(context);
+                } else if (carProvider.deleteCarStatus == StatusUtil.error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Failed to delete car.")),
+                  );
+                }
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  editShowDialog(BuildContext context, CarProvider carProvider, Car car) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit'),
+          content: Text('Are you sure you want to Edit?'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await carProvider.saveCar();
+                //edit operation
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AdminDashboard(
+                              car: car,
+                            )),
+                    (route) => false); // Close the dialog
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   pickImage() async {
-    final ImagePicker picker = ImagePicker();
-// Pick an image.
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    file = File(image!.path);
     setState(() {
-      // loader = true;
-      file;
+      // loader = true; // Set loader to true before upload
     });
+
+    final ImagePicker picker = ImagePicker();
+    // Pick an image.
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return; // User might have canceled
+
+    file = File(image.path);
+    setState(() {
+      file; // Update file state for preview
+    });
+
     try {
-      // List<String> fileName = file.path.split('/');
       String fileName = file.path.split('/').last;
-      var storageReference = FirebaseStorage.instance.ref();
+      var storageReference = FirebaseStorage.instance.ref().child('Rental');
       var uploadReference = storageReference.child(fileName);
       await uploadReference.putFile(file);
       downloadUrl = await uploadReference.getDownloadURL();
+
       setState(() {
-        downloadUrl;
-        loader = false;
+        downloadUrl; // Update downloadUrl for the form field
+        loader = false; // Hide loader after successful upload
       });
-      print("downloadUrl$downloadUrl");
     } catch (e) {
       setState(() {
-        loader = false;
+        loader = false; // Hide loader even on error
       });
+      print(e); // Print error for debugging
     }
   }
 }

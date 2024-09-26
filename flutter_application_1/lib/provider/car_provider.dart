@@ -6,19 +6,25 @@ import 'package:flutter_application_1/service/car_service.dart';
 import 'package:flutter_application_1/service/car_service_impl.dart';
 
 class CarProvider extends ChangeNotifier {
-  String? model,
-      year,
-      // image,
-      transmissionType,
-      vehicalType,
-      seatingCapacity,
-      fuelType,
-      mileage,
-      rentalPrice;
-  String? errorMessage;
+  String? id = "",
+      model = "",
+      year = "",
+      image = "",
+      transmissionType = "",
+      vehicalType = "",
+      seatingCapacity = "",
+      fuelType = "",
+      mileage = "",
+      rentalPrice = "";
+  String? errorMessage = "";
+  // String? id;
   TextEditingController? imageTextField;
+  bool carDeleteSuccessfull = false;
 
   bool isSuccess = false;
+  // setId(value) {
+  //   id = value;
+  // }
 
   setModel(value) {
     model = value;
@@ -65,6 +71,22 @@ class CarProvider extends ChangeNotifier {
   StatusUtil _getCarStatus = StatusUtil.none;
   StatusUtil get getCarStatus => _getCarStatus;
 
+  StatusUtil _deleteCarStatus = StatusUtil.none;
+  StatusUtil get deleteCarStatus => _deleteCarStatus;
+
+  StatusUtil _getDeleteStatus = StatusUtil.none;
+  StatusUtil get getDeleteStatus => _getDeleteStatus;
+
+  setgetDeleteStatus(StatusUtil status) {
+    _getDeleteStatus = status;
+    notifyListeners();
+  }
+
+  setDeleteCarStatus(StatusUtil status) {
+    _deleteCarStatus = status;
+    notifyListeners();
+  }
+
   setSaveCarStatus(StatusUtil status) {
     _saveCarStatus = status;
     notifyListeners();
@@ -80,10 +102,13 @@ class CarProvider extends ChangeNotifier {
       setSaveCarStatus(StatusUtil.loading);
     }
 
+    late ApiResponse response;
     Car car = Car(
+        id: id,
         model: model,
         year: year,
-        image: imageTextField!.text,
+        // image: imageTextField?.text,
+        image: image,
         vehicleType: vehicalType,
         fuelType: fuelType,
         mileage: mileage,
@@ -91,7 +116,12 @@ class CarProvider extends ChangeNotifier {
         seatingCapacity: seatingCapacity,
         rentalPrice: rentalPrice);
 
-    ApiResponse response = await carService.saveCar(car);
+    if (id!.isNotEmpty) {
+      response = await carService.updateCarData(car);
+    } else {
+      response = await carService.saveCar(car);
+    }
+
     if (response.statusUtil == StatusUtil.success) {
       isSuccess = true;
       setSaveCarStatus(StatusUtil.success);
@@ -113,6 +143,21 @@ class CarProvider extends ChangeNotifier {
     } else if (response.statusUtil == StatusUtil.error) {
       errorMessage = response.errorMessage;
       setGetCarStatus(StatusUtil.error);
+    }
+  }
+
+  Future<void> deleteCar(String id) async {
+    if (_deleteCarStatus != StatusUtil.loading) {
+      setDeleteCarStatus(StatusUtil.loading);
+    }
+
+    ApiResponse response = await carService.deleteCar(id);
+    if (response.statusUtil == StatusUtil.success) {
+      carDeleteSuccessfull = response.data;
+      setDeleteCarStatus(StatusUtil.success);
+    } else if (response.statusUtil == StatusUtil.error) {
+      errorMessage = response.data;
+      setDeleteCarStatus(StatusUtil.error);
     }
   }
 }

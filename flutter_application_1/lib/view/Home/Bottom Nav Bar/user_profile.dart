@@ -184,7 +184,7 @@ class _UserProfileState extends State<UserProfile> {
     try {
       await GoogleSignIn().disconnect();
     } catch (e) {
-      Helper.displaySnackBar(context, "Failed to disconnect on SignOut.");
+      // Helper.displaySnackBar(context, "Failed to disconnect on SignOut.");
     }
 
     Navigator.pushAndRemoveUntil(

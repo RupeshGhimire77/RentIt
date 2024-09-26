@@ -37,17 +37,12 @@ class UserServiceImpl extends UserService {
   Future<ApiResponse> getUser() async {
     if (await Helper.isInternetConnectionAvailable()) {
       try {
-        await FirebaseFirestore.instance
-            .collection("RentIt")
-            .get()
-            .then((value) {
-          userList.addAll(value.docs.map((value) {
-            final user = User1.fromJson(value.data());
-            //  user.id = value.id;
-            return user;
-          }).toList());
-          print(userList);
-        });
+        var value = await FirebaseFirestore.instance.collection("RentIt").get();
+        var userList = value.docs.map((e) => User1.fromJson(e.data())).toList();
+        for (int i = 0; i < userList.length; i++) {
+          userList[i].id = value.docs[i].id;
+        }
+
         return ApiResponse(statusUtil: StatusUtil.success, data: userList);
       } catch (e) {
         return ApiResponse(

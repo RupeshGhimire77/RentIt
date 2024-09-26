@@ -27,6 +27,8 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     getValue();
+    getUserData();
+    getCarData();
   }
 
   String? name, email, role;
@@ -38,13 +40,33 @@ class _HomePageState extends State<HomePage> {
       email = prefs.getString("email");
       role = prefs.getString("role");
 
-      var provider = Provider.of<CarProvider>(context, listen: false);
-      await provider.saveCar();
+      // var provider = Provider.of<CarProvider>(context, listen: false);
+      // await provider.getCar();
 
-      setState(() {
-        user = User1(email: email, name: name, role: role);
-      });
+      // setState(() {
+      //   // user = User1(email: email, name: name, role: role);
+      // });
     });
+  }
+
+  getUserData() async {
+    Future.delayed(
+      Duration.zero,
+      () async {
+        var provider = Provider.of<UserProvider>(context, listen: false);
+        await provider.getUser();
+      },
+    );
+  }
+
+  getCarData() async {
+    Future.delayed(
+      Duration.zero,
+      () async {
+        var provider = Provider.of<CarProvider>(context, listen: false);
+        await provider.getCar();
+      },
+    );
   }
 
   @override
@@ -63,6 +85,7 @@ class _HomePageState extends State<HomePage> {
     ];
 
     User1? user;
+
     // Get the current user
     // User? user1 = FirebaseAuth.instance.currentUser;
 
@@ -111,7 +134,7 @@ class _HomePageState extends State<HomePage> {
               builder: (context, carProvider, child) => carProvider
                           .getCarStatus ==
                       StatusUtil.loading
-                  ? CircularProgressIndicator()
+                  ? Center(child: CircularProgressIndicator())
                   : Column(
                       children: [
                         Padding(
@@ -191,50 +214,56 @@ class _HomePageState extends State<HomePage> {
                                   )
                                 ],
                               ),
-                              SizedBox(
-                                height: 155,
-                                child: ListView.builder(
-                                  itemCount: brandList.length,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10, top: 10),
-                                      child: Container(
-                                        height: 150,
-                                        width: 90,
-                                        decoration: BoxDecoration(
-                                            border:
-                                                Border.all(color: Colors.black),
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            color:
-                                                Colors.white.withOpacity(0.1)),
-                                        child: Column(children: [
-                                          SizedBox(
-                                            height: 90,
-                                            width: 90,
-                                            child: ClipRRect(
+                              Padding(
+                                padding: const EdgeInsets.only(right: 12),
+                                child: SizedBox(
+                                  height: 155,
+                                  child: ListView.builder(
+                                    itemCount: carProvider.carList.length,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10, top: 10),
+                                        child: Container(
+                                          height: 150,
+                                          width: 90,
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.black),
                                               borderRadius:
                                                   BorderRadius.circular(20),
-                                              child: Image.asset(
-                                                brandList[index].brandImg!,
-                                                fit: BoxFit.contain,
+                                              color: Colors.white
+                                                  .withOpacity(0.1)),
+                                          child: Column(children: [
+                                            // SizedBox(
+                                            //   height: 90,
+                                            //   width: 90,
+                                            //   child: ClipRRect(
+                                            //     borderRadius:
+                                            //         BorderRadius.circular(20),
+                                            //     child: Image.asset(
+                                            //     brandList[index].brandImg!,,
+                                            //     fit: BoxFit.contain,
+                                            //     ),
+                                            //   ),
+                                            // ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                // brandList[index].brandName!,
+                                                carProvider
+                                                    .carList[index].model!,
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              brandList[index].brandName!,
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          )
-                                        ]),
-                                      ),
-                                    );
-                                  },
+                                            )
+                                          ]),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                               Padding(

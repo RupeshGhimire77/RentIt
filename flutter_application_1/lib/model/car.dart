@@ -1,4 +1,5 @@
 class Car {
+  String? id;
   String? model;
   String? year;
   String? vehicleType;
@@ -10,7 +11,8 @@ class Car {
   String? image;
 
   Car(
-      {this.model,
+      {this.id,
+      this.model,
       this.year,
       this.vehicleType,
       this.seatingCapacity,
@@ -21,6 +23,7 @@ class Car {
       this.image});
 
   Car.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     model = json['model'];
     year = json['year'];
     vehicleType = json['vehicleType'];
@@ -34,6 +37,7 @@ class Car {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
     data['model'] = this.model;
     data['year'] = this.year;
     data['vehicleType'] = this.vehicleType;

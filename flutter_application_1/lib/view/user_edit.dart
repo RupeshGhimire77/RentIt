@@ -65,9 +65,9 @@ class _UserEditState extends State<UserEdit> {
 
       var json = {
         "name": "romans",
-        "address": "banepa",
+        // "address": "banepa",
         "photo_url": downloadUrl,
-        "age": 12
+        // "age": 12
       };
       await FirebaseFirestore.instance.collection("user").add(json);
       setState(() {
