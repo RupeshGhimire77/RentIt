@@ -40,13 +40,15 @@ dependencies:
   firebase_core: ^2.24.2
   provider: ^6.1.2
   firebase_auth: ^4.16.0
-  image_picker: ^1.0.7
+  image_picker: ^1.1.2
   firebase_storage: ^11.6.0
   flutter_otp_text_field: ^1.1.1
   flutter_launcher_icons: ^0.13.1
   shared_preferences: ^2.2.2
   google_sign_in: ^6.1.6
   font_awesome_flutter: ^10.7.0
+  image: ^4.2.0
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:

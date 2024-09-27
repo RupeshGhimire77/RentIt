@@ -7,6 +7,7 @@ import 'package:flutter_application_1/Utils/helper.dart';
 import 'package:flutter_application_1/firebase_options.dart';
 import 'package:flutter_application_1/provider/car_provider.dart';
 import 'package:flutter_application_1/provider/user_provider.dart';
+import 'package:flutter_application_1/view/Home/Bottom%20Nav%20Bar/description_page.dart';
 import 'package:flutter_application_1/view/Home/Bottom%20Nav%20Bar/home_page.dart';
 import 'package:flutter_application_1/view/Home/bottom_navbar.dart';
 
@@ -62,9 +63,9 @@ class _MyAppState extends State<MyApp> {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: isUserLoggedIn ? BottomNavBar() : Login(),
+        // home: isUserLoggedIn ? BottomNavBar() : Login(),
 
-        // home: UserEdit(),
+        home: DescriptionPage(),
       ),
     );
   }

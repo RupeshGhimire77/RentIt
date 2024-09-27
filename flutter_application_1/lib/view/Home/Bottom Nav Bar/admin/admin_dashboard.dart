@@ -303,14 +303,12 @@ class AdminDashboardState extends State<AdminDashboard> {
                         )),
               if (downloadUrl != null)
                 Visibility(
-                  visible: true,
+                  visible: false,
                   child: CustomTextFormField(
                     controller: carProvider.setImage(downloadUrl!),
                     labelText: "Car Image",
                   ),
-                )
-              else
-                SizedBox(),
+                ),
               CustomTextFormField(
                 initialValue: carProvider.model,
                 labelText: modelCarStr,
